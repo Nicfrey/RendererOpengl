@@ -17,6 +17,7 @@ ImageComponent::ImageComponent(const char* path)
 {
 	if(!m_pShader)
 	{
+		std::cout << "loading shader\n";
 		LoadShader();
 	}
 	LoadImage(path);
