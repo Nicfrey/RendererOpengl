@@ -18,9 +18,12 @@ public:
 	Shader(Shader&&) = delete;
 	Shader& operator=(const Shader&) = delete;
 	Shader& operator=(Shader&&) = delete;
+	static void CheckError(const char* context);
 
 private:
 	GLuint CompileShader(GLenum type, const char* source);
 	std::string LoadShaderSource(const char* path);
 	GLuint m_ShaderProgram;
+	GLuint m_VertexShader;
+	GLuint m_FragmentShader;
 };

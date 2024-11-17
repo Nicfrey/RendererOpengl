@@ -21,57 +21,88 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, bool isFile)
 		fragmentCode = fragmentPath;
 	}
 
-	const GLuint vertexShader = CompileShader(GL_VERTEX_SHADER, vertexCode.c_str());
-	const GLuint fragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentCode.c_str());
+	m_VertexShader = CompileShader(GL_VERTEX_SHADER, vertexCode.c_str());
+	m_FragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentCode.c_str());
 
 	m_ShaderProgram = glCreateProgram();
-	glAttachShader(m_ShaderProgram,vertexShader);
-	glAttachShader(m_ShaderProgram,fragmentShader);
+	glAttachShader(m_ShaderProgram, m_VertexShader);
+	CheckError("Attach vertex shader");
+	glAttachShader(m_ShaderProgram,m_FragmentShader);
+	CheckError("Attach fragment shader");
 	glLinkProgram(m_ShaderProgram);
+	CheckError("Link shader program");
 
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	//glDeleteShader(vertexShader);
+	//glDeleteShader(fragmentShader);
 }
 
 Shader::~Shader()
 {
+	glUseProgram(0);
+	CheckError("Remove program");
+	glDetachShader(m_ShaderProgram,m_VertexShader);
+	CheckError("detach vertex shader");
+	glDetachShader(m_ShaderProgram,m_FragmentShader);
+	CheckError("detach fragment program");
+	glDeleteShader(m_VertexShader);
+	CheckError("delete vertex shader");
+	glDeleteShader(m_FragmentShader);
+	CheckError("delete fragment shader");
 	glDeleteProgram(m_ShaderProgram);
+	CheckError("delete program");
 }
 
 void Shader::Use()
 {
 	glUseProgram(m_ShaderProgram);
+	CheckError("use vertex program");
 }
 
 void Shader::SetUniform(const char* name, glm::mat4 mat) const
 {
 	const GLint location = glGetUniformLocation(m_ShaderProgram, name);
 	glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
+	CheckError("Set uniformMatrix4fv");
 }
 
 void Shader::SetUniform(const char* name, glm::vec3 vec) const
 {
 	const GLint location = glGetUniformLocation(m_ShaderProgram, name);
 	glUniform3fv(location, 1, &vec[0]);
+	CheckError("Set uniformMatrix3fv");
 }
 
 void Shader::SetUniform(const char* name, float value) const
 {
 	const GLint location = glGetUniformLocation(m_ShaderProgram, name);
 	glUniform1f(location, value);
+	CheckError("Set uniformMatrix1f");
 }
 
 void Shader::SetUniform(const char* name, int value) const
 {
 	const GLint location = glGetUniformLocation(m_ShaderProgram, name);
 	glUniform1i(location, value);
+	CheckError("Set uniformMatrix1i");
 }
 
-GLuint Shader::CompileShader(GLenum type, const char* source)
+void Shader::CheckError(const char *context)
+{
+	GLenum error = glGetError();
+	if(error != GL_NO_ERROR)
+	{
+		std::cerr << "OpenGL Error (" << error << ") at " << context << "\n";
+	}
+}
+
+GLuint Shader::CompileShader(GLenum type, const char *source)
 {
 	const GLuint shader{ glCreateShader(type) };
+	CheckError("Creation Shader");
 	glShaderSource(shader, 1, &source,nullptr);
+	CheckError("Set Shader source");
 	glCompileShader(shader);
+	CheckError("Compile Shader");
 
 	GLint success;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);

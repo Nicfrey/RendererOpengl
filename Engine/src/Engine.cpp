@@ -64,10 +64,10 @@ void Engine::Start(const std::function<void()>& load)
         const auto sleepTime{ currentTime + std::chrono::milliseconds(MS_PER_FRAME) - std::chrono::high_resolution_clock::now() };
         std::this_thread::sleep_for(sleepTime);
     }
-    renderer.Destroy();
-	sceneManager.Destroy();
-	fontManager.Destroy();
+    fontManager.Destroy();
 	shaderManager.Destroy();
+    sceneManager.Destroy();
+    renderer.Destroy();
 }
 
 glm::ivec2 Engine::GetWindowSize()

@@ -1,12 +1,14 @@
 #include "ImageComponent.h"
 #include <iostream>
 
+#include "Engine.h"
 #include "Image.h"
 #include "imgui.h"
 #include "Shader.h"
 #include "ShaderManager.h"
 #include "Transform.h"
 #include "glm/ext/matrix_clip_space.hpp"
+#include "Vertex.h"
 
 Shader* ImageComponent::m_pShader{ nullptr };
 GLuint ImageComponent::m_VAO{ 0 };
@@ -31,13 +33,13 @@ ImageComponent::~ImageComponent()
 void ImageComponent::Render() const
 {
 	m_pShader->Use();
-	m_pShader->SetUniform("projection", glm::ortho(0.0f, 800.0f, 0.0f, 600.0f));
-	m_pShader->SetUniform("texture1", 0);
+	m_pShader->SetUniform("projection", glm::ortho(0.0f, static_cast<float>(Engine::GetWindowSize().x), 0.0f,static_cast<float>(Engine::GetWindowSize().y)));
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_pImage->GetTextureID());
 	glBindVertexArray(m_VAO);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
 	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D,0);
 }
 
 void ImageComponent::RenderGUI()
@@ -91,25 +93,24 @@ void ImageComponent::LoadShader()
 
 		void main()
 		{
-			FragColor = texture(texture1, TexCoord);
+			FragColor = vec4(TexCoord,0.0,1.0);
 		}
 	)";
 
-	constexpr float vertices[] = {
-		0.5f,0.5f, 1.0f, 1.0f, // top right
-		0.5f,-0.5f, 1.0f, 0.0f, // bottom right
-		-0.5f,-0.5f, 0.0f, 0.0f, // bottom left
-		-0.5f,0.5f,0.f,1.0f // top left
+	const std::vector<Vertex2D> vertices = {
+		{{0.5f,0.5f},{1.f,1.f}},
+		{{0.5f,-0.5f},{1.f,0.f}},
+		{{-0.5f,-0.5f},{0.f,0.f}},
+		{{-0.5f,0.5f},{0.f,1.f}}	
 	};
 
-	const GLuint indices[] = {
+	const std::vector<GLuint> indices = {
 			0,1,3,
 			1,2,3
 	};
 
 	m_pShader = new Shader(vertexShaderSource, fragmentShaderSource,false);
 	ShaderManager::GetInstance().AddShader(m_pShader);
-	std::cout << glGetError() << std::endl;
 
 	glGenVertexArrays(1, &m_VAO);
 	glGenBuffers(1, &m_VBO);
@@ -118,15 +119,15 @@ void ImageComponent::LoadShader()
 	glBindVertexArray(m_VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex2D), vertices.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0,2,GL_FLOAT, GL_FALSE,sizeof(Vertex2D), (GLvoid*)offsetof(Vertex2D,position));
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+	glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,sizeof(Vertex2D),(GLvoid*)offsetof(Vertex2D,texCoord));
 	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
