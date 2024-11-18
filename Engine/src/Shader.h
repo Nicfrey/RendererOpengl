@@ -19,6 +19,8 @@ public:
 	Shader& operator=(const Shader&) = delete;
 	Shader& operator=(Shader&&) = delete;
 	static void CheckError(const char* context);
+	static void DebugBuffer(GLuint buffer, size_t size);
+	static void DebugEBO(GLuint ebo, size_t size);
 
 private:
 	GLuint CompileShader(GLenum type, const char* source);

@@ -25,9 +25,12 @@ void TextComponent::Render() const
 
 void TextComponent::RenderGUI()
 {
+	float color[3] = { m_Color.x, m_Color.y, m_Color.z };
 	int size { m_pFont->GetSize() };
 	ImGui::Text("Text Component");
 	ImGui::DragInt("Size", &size, 1, 8, 128);
+	ImGui::DragFloat3("Color", color, 0.001f);
+	m_Color = glm::vec3{ color[0],color[1],color[2] };
 	if(size != m_pFont->GetSize())
 	{
 		m_pFont->SetSize(size);

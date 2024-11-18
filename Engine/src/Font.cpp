@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "Engine.h"
 #include "Shader.h"
 #include "ShaderManager.h"
 #include "freetype/internal/ftobjs.h"
@@ -32,7 +33,8 @@ void Font::Render(const std::string& text, float x, float y, float scale, const 
 {
 	m_pShader->Use();
 	m_pShader->SetUniform("textColor", color);
-	m_pShader->SetUniform("projection", glm::ortho(0.0f, 800.0f, 0.0f, 600.0f));
+	m_pShader->SetUniform("projection", glm::ortho(0.0f, static_cast<float>(Engine::GetWindowSize().x)
+		, 0.0f, static_cast<float>(Engine::GetWindowSize().y)));
 	m_pShader->SetUniform("text", 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(m_VAO);

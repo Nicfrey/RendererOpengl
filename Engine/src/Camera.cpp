@@ -33,7 +33,7 @@ Camera::~Camera()
 void Camera::SetupCamera(float fovAngle, float aspectRatio)
 {
     m_FOVAngle = fovAngle;
-    m_FOV = tanf(MathHelper::DegToRad(fovAngle));
+    m_FOV = tanf(MathHelper::DegToRad(fovAngle) / 2.f);
     m_Aspect = aspectRatio;
 
     CalculateProjectionMatrix();
@@ -56,7 +56,7 @@ void Camera::RenderGUI()
 	ImGui::Text("Aspect: %.2f", m_Aspect);
 	ImGui::Text("Near: %.2f", m_Near);
 	ImGui::Text("Far: %.2f", m_Far);
-    m_FOV = tanf(MathHelper::DegToRad(m_FOVAngle));
+    m_FOV = tanf(MathHelper::DegToRad(m_FOVAngle) / 2.f);
 }
 
 glm::mat4 Camera::GetProjectionMatrix() const
@@ -73,6 +73,11 @@ glm::mat4 Camera::GetViewMatrix() const
 bool Camera::IsMainCamera() const
 {
 	return m_IsMainCamera;
+}
+
+float Camera::GetFOVAngle() const
+{
+    return m_FOVAngle;
 }
 
 Camera* Camera::GetMainCamera()

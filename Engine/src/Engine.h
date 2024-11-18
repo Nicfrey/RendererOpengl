@@ -2,6 +2,7 @@
 #include <functional>
 #include <gl/glew.h>
 
+#include "GLFW/glfw3.h"
 #include "glm/vec2.hpp"
 
 class Shader;
@@ -25,6 +26,7 @@ class Engine
         const char* m_Title{"OpenGL Window"};
         void CreateWindowApp(int width, int height, const char* title);
         void InitializeGlew();
+        static void FrameBufferSizeCallback(GLFWwindow* pWindow, int width, int height);
         void StartHeapControl();
         void DumpMemoryLeaks();
 };

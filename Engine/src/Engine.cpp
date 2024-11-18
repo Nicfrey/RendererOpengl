@@ -5,21 +5,18 @@
 #include <windows.h>
 #include <chrono>
 #include <iostream>
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
 #include <crtdbg.h>
 #include <heapapi.h>
+#include <thread>
 
 
+#include "Camera.h"
 #include "Font.h"
 #include "FontManager.h"
 #include "Renderer.h"
 #include "SceneManager.h"
-#include "Shader.h"
 #include "ShaderManager.h"
 #include "TimeEngine.h"
-#include "freetype/freetype.h"
 
 
 glm::ivec2 Engine::m_WindowSize{800,600};
@@ -93,6 +90,7 @@ void Engine::CreateWindowApp(int width, int height, const char* title)
         throw std::runtime_error("Failed to create window!");
     }
     glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallback);
     Renderer::GetInstance().Init(window);
 }
 
@@ -103,6 +101,13 @@ void Engine::InitializeGlew()
     {
         throw std::runtime_error("Failed to initialize GLEW!");
     }
+}
+
+void Engine::FrameBufferSizeCallback(GLFWwindow* pWindow, int width, int height)
+{
+    glViewport(0, 0, width, height);
+    m_WindowSize = glm::ivec2{ width,height };
+    Camera::GetMainCamera()->SetupCamera(Camera::GetMainCamera()->GetFOVAngle(),width/static_cast<float>(height));
 }
 
 void Engine::StartHeapControl()

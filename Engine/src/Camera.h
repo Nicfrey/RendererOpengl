@@ -20,6 +20,7 @@ public:
     glm::mat4 GetProjectionMatrix() const;
     glm::mat4 GetViewMatrix() const;
     bool IsMainCamera() const;
+    float GetFOVAngle() const;
     static Camera* GetMainCamera();
 
 private:

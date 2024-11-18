@@ -1,9 +1,12 @@
 #include "Shader.h"
 
+#include <complex.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <vector>
+
 #include "glm/glm.hpp"
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath, bool isFile)
@@ -31,9 +34,6 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, bool isFile)
 	CheckError("Attach fragment shader");
 	glLinkProgram(m_ShaderProgram);
 	CheckError("Link shader program");
-
-	//glDeleteShader(vertexShader);
-	//glDeleteShader(fragmentShader);
 }
 
 Shader::~Shader()
@@ -93,6 +93,36 @@ void Shader::CheckError(const char *context)
 	{
 		std::cerr << "OpenGL Error (" << error << ") at " << context << "\n";
 	}
+}
+
+void Shader::DebugBuffer(GLuint buffer, size_t size)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	std::vector<float> data(size / sizeof(float));
+	glGetBufferSubData(GL_ARRAY_BUFFER, 0, size, data.data());
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	std::cout << "Buffer Data: ";
+	for (size_t i = 0; i < data.size(); ++i)
+	{
+		std::cout << data[i] << " ";
+	}
+	std::cout << std::endl;
+}
+
+void Shader::DebugEBO(GLuint ebo, size_t size)
+{
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	std::vector<GLuint> data(size / sizeof(GLuint));
+	glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, size, data.data());
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	std::cout << "EBO Data: ";
+	for (unsigned int i : data)
+	{
+		std::cout << i << " ";
+	}
+	std::cout << "\n";
 }
 
 GLuint Shader::CompileShader(GLenum type, const char *source)
