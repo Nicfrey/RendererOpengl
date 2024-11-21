@@ -31,6 +31,10 @@ Font::~Font()
 
 void Font::Render(const std::string& text, float x, float y, float scale, const glm::vec3& color)
 {
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
 	m_pShader->Use();
 	m_pShader->SetUniform("textColor", color);
 	m_pShader->SetUniform("projection", glm::ortho(0.0f, static_cast<float>(Engine::GetWindowSize().x)

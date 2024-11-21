@@ -15,9 +15,18 @@
 void load()
 {
     Shader* pShader{ new Shader("resources/vertex.glsl","resources/fragment.glsl") };
-    ShaderManager::GetInstance().AddShader(pShader);
+
+	ShaderManager::GetInstance().AddShader(pShader);
     Scene* pScene{ new Scene{"Main Scene"} };
     SceneManager::GetInstance().AddScene(pScene);
+
+
+    GameObject* pImage{ new GameObject{"Image"} };
+    ImageComponent* pImageComponent{ new ImageComponent{"resources/Test.png"} };
+    pImage->AddComponent(pImageComponent);
+    pScene->AddGameObject(pImage);
+
+
     GameObject* pGameObject{ new GameObject{"Cube"} };
     Mesh* pCubeMesh{ Mesh::CreateCube() };
     MeshRenderer* pMeshRenderer{ new MeshRenderer{pShader,pCubeMesh} };
@@ -48,10 +57,10 @@ void load()
     pText->AddComponent(pTextComponent);
     pScene->AddGameObject(pText);
 
-    GameObject* pImage{ new GameObject{"Image"} };
-    ImageComponent* pImageComponent{ new ImageComponent{"resources/Test.png"} };
-    pImage->AddComponent(pImageComponent);
-    pScene->AddGameObject(pImage);
+    GameObject* pText2(new GameObject{ "Text2" });
+    TextComponent* pTextComponent2{ new TextComponent{"resources/Minecraft.ttf" , "Avec plaisir !"} };
+    pText2->AddComponent(pTextComponent2);
+    pScene->AddGameObject(pText2);
 }
 
 int main()

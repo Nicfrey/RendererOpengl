@@ -17,6 +17,16 @@ Image::~Image()
 	Destroy();
 }
 
+int Image::GetWidth() const
+{
+	return m_Width;
+}
+
+int Image::GetHeight() const
+{
+	return m_Height;
+}
+
 void Image::Destroy()
 {
 	if(m_TextureID == 0)
@@ -32,10 +42,9 @@ void Image::LoadImage(const char* path)
 	glGenTextures(1, &m_TextureID);
 	glBindTexture(GL_TEXTURE_2D, m_TextureID);
 
-	int width;
-	int height;
 	int nrChannels;
-	const auto data{ stbi_load(path,&width,&height,&nrChannels,0) };
+	stbi_set_flip_vertically_on_load(true);
+	const auto data{ stbi_load(path,&m_Width,&m_Height,&nrChannels,0) };
 	if (!data)
 	{
 		std::cerr << "Failed to load texture\n";
@@ -49,7 +58,7 @@ void Image::LoadImage(const char* path)
 
 		GLint format = nrChannels == 4 ? GL_RGBA : (nrChannels == 3 ? GL_RGB : GL_RED);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, m_Width, m_Height, 0, format, GL_UNSIGNED_BYTE, data);
 		Shader::CheckError("Generate texImage2D Image");
 		glGenerateMipmap(GL_TEXTURE_2D);
 		Shader::CheckError("GenerateMipMap Image");

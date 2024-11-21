@@ -29,7 +29,7 @@ void TextComponent::RenderGUI()
 	int size { m_pFont->GetSize() };
 	ImGui::Text("Text Component");
 	ImGui::DragInt("Size", &size, 1, 8, 128);
-	ImGui::DragFloat3("Color", color, 0.001f);
+	ImGui::DragFloat3("Color", color, 0.001f,0.f,1.f);
 	m_Color = glm::vec3{ color[0],color[1],color[2] };
 	if(size != m_pFont->GetSize())
 	{

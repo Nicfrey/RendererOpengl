@@ -79,6 +79,10 @@ void MeshRenderer::SetMesh(Mesh* pMesh)
 
 void MeshRenderer::Render() const
 {
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
 	const Camera* pCamera = Camera::GetMainCamera();
 	if(!m_pMesh || !m_pShader || !pCamera)
 	{

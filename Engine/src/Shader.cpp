@@ -1,6 +1,5 @@
 #include "Shader.h"
 
-#include <complex.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -34,6 +33,9 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, bool isFile)
 	CheckError("Attach fragment shader");
 	glLinkProgram(m_ShaderProgram);
 	CheckError("Link shader program");
+
+	glDeleteShader(m_VertexShader);
+	glDeleteShader(m_FragmentShader);
 }
 
 Shader::~Shader()
@@ -44,18 +46,11 @@ Shader::~Shader()
 	CheckError("detach vertex shader");
 	glDetachShader(m_ShaderProgram,m_FragmentShader);
 	CheckError("detach fragment program");
-	glDeleteShader(m_VertexShader);
-	CheckError("delete vertex shader");
-	glDeleteShader(m_FragmentShader);
-	CheckError("delete fragment shader");
-	glDeleteProgram(m_ShaderProgram);
-	CheckError("delete program");
 }
 
 void Shader::Use()
 {
 	glUseProgram(m_ShaderProgram);
-	CheckError("use vertex program");
 }
 
 void Shader::SetUniform(const char* name, glm::mat4 mat) const
