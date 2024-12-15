@@ -1,7 +1,12 @@
 #include "Mesh.h"
+
+#include <stdexcept>
 #include <GL/glew.h>
 
 #include "MathHelper.h"
+#include "assimp/Importer.hpp"
+#include "assimp/postprocess.h"
+#include "assimp/scene.h"
 
 std::vector<Vertex> Mesh::GetVertices() const
 {
@@ -217,11 +222,8 @@ Mesh* Mesh::CreateCylinder(float radius, float height, unsigned slices)
 	return pMesh;
 }
 
-void Mesh::CalculateNormals(std::vector<Vertex>& vertices, const std::vector<GLuint>& indices,
-	std::vector<GLfloat>& normals)
+void Mesh::CalculateNormals(std::vector<Vertex>& vertices, const std::vector<GLuint>& indices)
 {
-	normals.resize(vertices.size());
-
 	for(size_t i{}; i < indices.size(); ++i)
 	{
 		Vertex& v0{ vertices[indices[i]] };
@@ -236,4 +238,56 @@ void Mesh::CalculateNormals(std::vector<Vertex>& vertices, const std::vector<GLu
 		v1.normal += normal;
 		v2.normal += normal;
 	}
+}
+
+Mesh* Mesh::LoadFromFBX(const char* path)
+{
+	Assimp::Importer importer;
+	const aiScene* scene{ importer.ReadFile(path,aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices) };
+
+	if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+	{
+		throw std::runtime_error{ "Failed to load fbx file" };
+	}
+
+	aiMesh* mesh = scene->mMeshes[0];
+
+	Mesh* pMesh{new Mesh{}};
+
+	for (unsigned int i{}; i < mesh->mNumVertices; ++i)
+	{
+		Vertex vertex;
+		vertex.position = glm::vec3{ mesh->mVertices[i].x,mesh->mVertices[i].y ,mesh->mVertices[i].z };
+
+		if (mesh->HasNormals())
+		{
+			vertex.normal = glm::vec3{ mesh->mNormals[i].x,mesh->mNormals[i].y ,mesh->mNormals[i].z };
+		}
+
+		if (mesh->mTextureCoords[0])
+		{
+			vertex.texCoord = glm::vec2{ mesh->mTextureCoords[0][i].x,mesh->mTextureCoords[0][i].y };
+		}
+		else
+		{
+			vertex.texCoord = glm::vec2{ 0.f,0.f };
+		}
+
+		pMesh->m_Vertices.emplace_back(vertex);
+	}
+
+	for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
+		aiFace face = mesh->mFaces[i];
+		for (unsigned int j = 0; j < face.mNumIndices; ++j) {
+			pMesh->m_Indices.emplace_back(face.mIndices[j]);
+		}
+	}
+
+	// Calculate normals if no normals
+	if (!mesh->HasNormals())
+	{
+		CalculateNormals(pMesh->m_Vertices, pMesh->m_Indices);
+	}
+
+	return pMesh;
 }

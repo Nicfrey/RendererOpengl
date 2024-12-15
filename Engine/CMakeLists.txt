@@ -78,6 +78,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(freetype)
 
+FetchContent_Declare(
+    assimp
+    GIT_REPOSITORY https://github.com/assimp/assimp
+    GIT_TAG     v5.4.3
+    GIT_SHALLOW
+)
+FetchContent_MakeAvailable(assimp)
+
 set_target_properties(glfw PROPERTIES
         FOLDER "External Libraries" )
 
@@ -106,6 +114,7 @@ target_include_directories(Engine PUBLIC
     ${glm_SOURCE_DIR}
     ${IMGUI_DIR} ${IMGUI_DIR}/backends
     ${freetype_SOURCE_DIR}/include
+    ${assimp_SOURCE_DIR}/include
 )
 
 target_link_libraries(Engine PUBLIC 
@@ -115,4 +124,5 @@ target_link_libraries(Engine PUBLIC
     libglew_static
     ImGui
     freetype
+    assimp
 )

@@ -19,7 +19,8 @@ public:
 	static Mesh* CreatePlane();
 	static Mesh* CreateSphere(unsigned stacks = 32, unsigned slices = 32);
 	static Mesh* CreateCylinder(float radius = 1.f, float height = 2.f, unsigned slices = 32);
-	static void CalculateNormals(std::vector<Vertex>& vertices, const std::vector<GLuint>& indices, std::vector<GLfloat>& normals);
+	static void CalculateNormals(std::vector<Vertex>& vertices, const std::vector<GLuint>& indices);
+	static Mesh* LoadFromFBX(const char* path);
 private:
 	std::vector<Vertex> m_Vertices;
 	std::vector<GLuint> m_Indices;

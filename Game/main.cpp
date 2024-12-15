@@ -61,6 +61,11 @@ void load()
     TextComponent* pTextComponent2{ new TextComponent{"resources/Minecraft.ttf" , "Avec plaisir !"} };
     pText2->AddComponent(pTextComponent2);
     pScene->AddGameObject(pText2);
+
+    GameObject* pCloud{ new GameObject{"Clouds"} };
+    MeshRenderer* pCloudRenderer{ new MeshRenderer{pShader,Mesh::LoadFromFBX("resources/Clouds.fbx") } };
+    pCloud->AddComponent(pCloudRenderer);
+    pScene->AddGameObject(pCloud);
 }
 
 int main()
